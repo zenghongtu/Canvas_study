@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>flappy_bird</title>
+    <script src="./js/util.js"></script>
+    <script src="./js/sky.js"></script>
+    <script src="./js/land.js"></script>
+    <script src="./js/pipe.js"></script>
+    <script src="./js/bird.js"></script>
+</head>
+
+<body>
+    <canvas id="cvs"></canvas>
+    <script>
+        let cvs = document.querySelector("#cvs");
+        let ctx = cvs.getContext("2d");
+
+        loadImage({
+            sky: "./img/sky.png",
+            bird: "./img/bird.png",
+            land:"./img/land.png",
+            imgDown:"./img/pipeDown.png",
+            imgUp:"./img/pipeUp.png"
+        }, function (obj) {
+
+            
+            ctx.canvas.width = obj.sky.width;
+            ctx.canvas.height = obj.sky.height;
+
+            let roles = [];
+
+            roles.push(getSky(ctx, obj.sky, 5))
+            roles.push(getSky(ctx, obj.sky, 5))
+            
+            roles.push(getBird(ctx, obj.bird, 3, 1, 10, 10));
+
+            for(let i =0;i<4;i++){
+                roles.push(getLand(ctx,obj.land,5));
+            }
+            for(let i=0;i<6;i++){
+                roles.push(getPipe(ctx,obj.imgDown,obj.imgUp,obj.land.height,5));
+            }
+
+            let timer=setInterval(function () {
+                let bird = getBird();
+                let birdCoreX = bird.x + bird.width/2;
+                let birdCoreY =bird.y + bird.height/2;
+                if(ctx.isPointInPath(birdCoreX,birdCoreY) || birdCoreY<0 || birdCoreY>(ctx.canvas.height - obj.land.height)){
+                    clearInterval(timer);
+                    ctx.fillStyle = "rbg(255,255,255,0.1)";
+                    ctx.fillRect(0,0,ctx.canvas.width,ctx.canvas.height);
+                    ctx.textAlign = "center";
+                    ctx.textBaseline = "middle";
+                    ctx.fillStyle = "red";
+                    ctx.font = "900 40px sinsum";
+                    ctx.fillText("Game Over",ctx.canvas.width/2,ctx.canvas.height/2);
+                    return;
+                }
+
+                
+
+                ctx.beginPath();
+                roles.forEach(function(role){
+                    role.draw();
+                    role.update();
+                })
+            
+            }, 50)
+
+
+        })
+    </script>
+</body>
+
+</html>
